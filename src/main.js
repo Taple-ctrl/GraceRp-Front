@@ -1,21 +1,6 @@
-/* eslint-disable */
 import { createApp } from 'vue'
 import App from './App.vue'
 
-// if (!('mp' in window)) {
-//     window.mp = {
-//         trigger(name, ...args) {
-//             console.log(name,args)
-//         },
-//         events: {
-//             add(name, ...args) {
-//                 console.log(name,args)
-//             },
-//             call(name) {
-//                 console.log(name)
-//             }
-//         }
-//     }
-// }
+import rage from './plugins/rage'
 
-createApp(App).mount('#app')
+createApp(App).use(rage).mount('#app')

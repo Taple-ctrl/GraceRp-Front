@@ -31,7 +31,7 @@
 
 <script>
 
-// import {CLIENT_EVENTS} from "@/shared/const/events";
+import {CLIENT_EVENTS} from "@/shared/const/events";
 
 export default {
   name: 'AuthMain',
@@ -66,13 +66,13 @@ export default {
       this.isAuthRegBlock = !this.isAuthRegBlock;
     },
     getAuth(){
-      // mp.trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
-      //   login:this.registrationModel.login,
-      //   email:this.registrationModel.email,
-      //   password:this.registrationModel.password,
-      //   password2:this.registrationModel.password2,
-      //   promo:this.registrationModel.promo,
-      // }))
+      this.$trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
+        login:this.registrationModel.login,
+        email:this.registrationModel.email,
+        password:this.registrationModel.password,
+        password2:this.registrationModel.password2,
+        promo:this.registrationModel.promo,
+      }))
     },
     getReg(){
       // mp.trigger(CLIENT_EVENTS.AUTH_SEND_LOGIN_DATA, JSON.stringify({

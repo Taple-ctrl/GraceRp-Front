@@ -1,6 +1,8 @@
 <template>
+<div id="app">
   <HudMain v-if="isHud"/>
   <AuthMain v-if="isAuth"/>
+</div>
 </template>
 
 <script>
@@ -23,7 +25,16 @@ export default {
 </script>
 
 <style>
-*{
+
+#app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
