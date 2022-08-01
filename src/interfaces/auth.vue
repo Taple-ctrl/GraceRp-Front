@@ -303,7 +303,6 @@ body{
 }
 
 .right-slide{
-  padding-left: 34px;
   padding-top: 23px;
   padding-bottom: 29px;
   width: 49%;
@@ -322,6 +321,7 @@ body{
 .right-slide-text{
   display: flex;
   flex-direction: column;
+  padding-left: 34px;
   gap: 1em;
 }
 
