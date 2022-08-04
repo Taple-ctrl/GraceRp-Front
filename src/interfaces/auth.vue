@@ -450,7 +450,6 @@ body{
 }
 
 .newPassword-input{
-  padding: 1.5%;
   background: #161616;
   border-radius: 5px;
   padding: 3.5% 3%;
