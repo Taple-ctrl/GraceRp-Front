@@ -1,7 +1,6 @@
 <template>
   <div class="AuthMain">
     <div class="authAndRegBlock" v-if="isAuthRegBlock">
-
       <div class="Auth-block" v-if="isAuth">
         <div class="Auth-block-text">
           <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
@@ -58,7 +57,7 @@
             <input type="password" v-model="ischeckregistrationModel.password2" placeholder="Повторите пароль">
           </div>
           <div class="forgot-password">
-            <input type="checkbox">
+            <input type="checkbox" v-model="successRules">
             <div class="forgot-password-text">Я ознакомился с правилами проекта</div>
           </div>
           <div class="Auth_btn" v-on:click="getReg">Продолжить регистрацию</div>
@@ -79,14 +78,58 @@
       <img v-on:click="showRecovery" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
       <div class="Auth-block-text">
         <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
-        <div class="authBlock_title">Востановление</div>
+        <div class="authBlock_title">Восстановление</div>
         <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
       </div>
       <div class="login-input">
         <img src="../assets/images/auth/icons/bxs_user-account.png" alt="bxs_user-account">
-        <input type="text" v-model="ischeckregistrationModel.email" placeholder="E-mail">
+        <input type="text" v-model="recoveryModel.email" placeholder="E-mail">
       </div>
-      <div class="Auth_btn">Продолжить восстановление</div>
+      <div class="Auth_btn" v-on:click="showRecoveryCode">Продолжить восстановление</div>
+    </div>
+
+    <div class="recover-code" v-if="isRecoveryCode">
+      <img v-on:click="backRecoveryCode" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <div class="recover-code-block">
+        <div class="recover-code-block-text">
+          <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
+          <div class="authBlock_title">Восстановление</div>
+          <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
+        </div>
+        <div class="recover-code-input">
+          <input v-model="recoveryCode.number1" type="text" maxlength="1">
+          <input v-model="recoveryCode.number2" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number3" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number4" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number5" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number6" type="text"  maxlength="1">
+        </div>
+        <div class="authBlock_subtitle">Введите шестизначный код, который вы получили на свою почту.</div>
+        <div class="Auth_btn" v-on:click="showNewPassword">Продолжить восстановление</div>
+      </div>
+    </div>
+
+    <div class="recover-code" v-if="isNewPassword">
+      <img v-on:click="backNewPassword" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <div class="recover-code-block">
+        <div class="recover-code-block-text">
+          <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
+          <div class="authBlock_title">Восстановление</div>
+          <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
+        </div>
+        <div class="newPassword-Input-block">
+          <div class="newPassword-input">
+            <img src="../assets/images/auth/icons/fluent_lock-multiple-20-filled.png" alt="fluent_lock">
+            <input type="password" v-model="newPassword.password1" placeholder="Пароль">
+          </div>
+          <div class="newPassword-input">
+            <img src="../assets/images/auth/icons/fluent_lock-multiple-20-filled.png" alt="fluent_lock">
+            <input type="password" v-model="newPassword.password2" placeholder="Повторите пароль">
+          </div>
+        </div>
+        <div class="authBlock_subtitle newPassword-subtitle">Введите новый пароль и не забудьте его записать, чтобы в<br>следующий раз не забыть или потерять его!</div>
+        <div class="Auth_btn" v-on:click="FinalNewPassword">Восстановить</div>
+      </div>
     </div>
   </div>
 </template>
@@ -106,6 +149,10 @@ export default {
       isAuth: true,
       isReg: false,
       isRecovery: false,
+      isRecoveryCode:false,
+      TestCode: 666666,
+      successRules: false,
+      isNewPassword: false,
       ischeckregistrationModel: {
         login: '',
         email: '',
@@ -124,14 +171,26 @@ export default {
       },
       recoveryModel: {
         email: ''
+      },
+      recoveryCode: {
+        number1: '',
+        number2: '',
+        number3: '',
+        number4: '',
+        number5: '',
+        number6: '',
+      },
+      newPassword:{
+        password1: '',
+        password2: ''
       }
     }
   },
   methods:{
     getAuth(){
-      if (this.authorizationModel.login == ''){
+      if (this.authorizationModel.login === ''){
         console.log('Введите Логин')
-      }else if(this.authorizationModel.password == ''){
+      }else if(this.authorizationModel.password === ''){
         console.log('Введите Пароль')
       }else{
         this.$trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
@@ -142,15 +201,17 @@ export default {
       }
     },
     getReg(){
-      if (this.ischeckregistrationModel.login == ''){
+      if (this.ischeckregistrationModel.login === ''){
         console.log('Введите Логин')
-      }else if(this.ischeckregistrationModel.email == ''){
+      }else if(this.ischeckregistrationModel.email === ''){
         console.log('Введите Email')
-      }else if(this.ischeckregistrationModel.password == ''){
+      }else if(this.ischeckregistrationModel.password === ''){
         console.log('Введите пароль')
-      }else if(this.ischeckregistrationModel.password2 == ''){
+      }else if(this.ischeckregistrationModel.password2 === ''){
         console.log('Введите пароль2')
-      }else{
+      }else if(this.ischeckregistrationModel.password !== this.ischeckregistrationModel.password2){
+        console.log('Пароли не совпадают')
+      }else if(this.successRules === true){
         this.$trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
           login:this.ischeckregistrationModel.login,
           email:this.ischeckregistrationModel.email,
@@ -158,7 +219,10 @@ export default {
           password2:this.ischeckregistrationModel.password2,
         }))
         console.log('Регистрация')
+      }else{
+        console.log('Подтвердите правила проекта')
       }
+
     },
     showAuth(){
       if(this.isAuth === false){
@@ -173,12 +237,51 @@ export default {
       }
     },
     showRecovery(){
-      if (this.isRecovery == false){
+      if (this.isRecovery === false){
         this.isRecovery = true;
         this.isAuthRegBlock = false;
       }else{
         this.isRecovery = false;
         this.isAuthRegBlock = true;
+      }
+    },
+    backRecoveryCode(){
+      this.isRecoveryCode = false;
+      this.isRecovery = true;
+    },
+    backNewPassword(){
+      this.isNewPassword = false;
+      this.isRecoveryCode = true;
+    },
+    showRecoveryCode(){
+      if(this.recoveryModel.email === ''){
+        console.log('Введите почту')
+      }else{
+        this.isRecoveryCode = true;
+        this.isRecovery = false;
+      }
+    },
+    showNewPassword(){
+      const fullcode = parseInt(this.recoveryCode.number1 + this.recoveryCode.number2 + this.recoveryCode.number3 + this.recoveryCode.number4 + this.recoveryCode.number5 + this.recoveryCode.number6);
+      console.log(fullcode)
+      console.log(this.TestCode)
+      if (fullcode === this.TestCode){
+        console.log("Код верен")
+        this.isRecoveryCode = false;
+        this.isNewPassword = true;
+      }else{
+        console.log("Ошибка")
+      }
+    },
+    FinalNewPassword(){
+      if (this.newPassword.password1 === ''){
+        console.log('Введите новый пароль')
+      }else if(this.newPassword.password2 === ''){
+        console.log('Введите новый пароль повторно')
+      }else if(this.newPassword.password1 === this.newPassword.password2){
+        console.log('Пароль успешно изменен')
+      }else{
+        console.log('пароли не совпадают')
       }
     }
   }
@@ -210,6 +313,7 @@ body{
   display: flex;
   align-items: center;
   gap: 17px;
+  margin-bottom: 5%;
 }
 
 .login-input img{
@@ -255,6 +359,7 @@ body{
   background-color: rgb(0,0,0,0);
   border: 0;
   outline:none;
+  width: 100%;
 }
 
 .password-input input::-webkit-input-placeholder{
@@ -292,6 +397,82 @@ body{
   padding: 3vw 4vh;
   border-radius:9px 0 0 9px;
   gap: .5em;
+}
+
+.recover-code{
+  background: #101010;
+  padding: 3vw 4vh;
+  border-radius:9px;
+  width: 30%;
+  height: 55%;
+}
+
+.recover-code-block{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5em;
+  height: 100%;
+}
+
+.recover-code-block-text{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.recover-code-input{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recover-code-input input[type="text"]{
+  width: 10%;
+  height: 5vh;
+  text-align: center;
+  background-color: #161616;
+  border: 0;
+  outline:none;
+  color: white;
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.5vw;
+}
+
+.newPassword-Input-block{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.newPassword-input{
+  padding: 1.5%;
+  background: #161616;
+  border-radius: 5px;
+  padding: 3.5% 3%;
+  gap: 0.5em;
+  display: flex;
+  align-items: center;
+}
+
+.newPassword-input input[type="password"]{
+  background-color: rgb(0,0,0,0);
+  border: 0;
+  outline:none;
+  color: gray;
+}
+
+.newPassword-input input[placeholder], [placeholder], *[placeholder]{
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.7vw;
+
+  color: rgba(255, 255, 255, 0.13);
 }
 
 .recover{
@@ -464,16 +645,22 @@ body{
   font-family: 'Nunito',sans-serif;
   font-style: normal;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 1vw;
   color: #FFFFFF;
   cursor: pointer;
   text-align: center;
   padding: 4% 0;
+  width: 100%;
 }
 
 .back-auth{
   position: absolute;
   cursor: pointer;
+}
+
+.newPassword-subtitle{
+  width: 100%;
+  text-align: left;
 }
 
 </style>
