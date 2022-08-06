@@ -9,7 +9,12 @@ export default {
 
         app.config.globalProperties.$addEvent = (eventName, callback) => {
             if ('mp' in window) mp.events.add(eventName, callback)
-            else console.log(`Add event ${eventName} - ${args}`)
+            else console.log(`Add event ${eventName} - ${callback}`)
+        }
+
+        app.config.globalProperties.$removeEvent = (eventName) => {
+            if ('mp' in window) mp.events.remove(eventName)
+            else console.log(`Remove event ${eventName}`)
         }
     }
 }

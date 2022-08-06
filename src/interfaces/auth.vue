@@ -85,7 +85,7 @@
         <img src="../assets/images/auth/icons/bxs_user-account.png" alt="bxs_user-account">
         <input type="text" v-model="recoveryModel.email" placeholder="E-mail">
       </div>
-      <div class="Auth_btn" v-on:click="showRecoveryCode">Продолжить восстановление</div>
+      <div class="Auth_btn" v-on:click="sendRecoveryEmail">Продолжить восстановление</div>
     </div>
 
     <div class="recover-code" v-if="isRecoveryCode">
@@ -126,7 +126,7 @@
           <input v-model="recoveryCode.number6" type="text"  maxlength="1">
         </div>
         <div class="authBlock_subtitle">Введите шестизначный код, который вы получили на свою почту.</div>
-        <div class="Auth_btn" v-on:click="showNewPassword">Завершить регистрацию</div>
+        <div class="Auth_btn" v-on:click="sendRegistrationCode">Завершить регистрацию</div>
       </div>
     </div>
 
@@ -156,9 +156,6 @@
 </template>
 
 <script>
-
-import {CLIENT_EVENTS} from "@/shared/const/events";
-
 export default {
   name: 'AuthMain',
   components:{
@@ -214,9 +211,10 @@ export default {
       }else if(this.authorizationModel.password === ''){
         console.log('Введите Пароль')
       }else{
-        this.$trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
-          login:this.authorizationModel.login,
-          password:this.authorizationModel.password,
+        this.$trigger('client.auth.transferLoginData', JSON.stringify({
+          login: this.authorizationModel.login,
+          password: this.authorizationModel.password,
+          savePassword: false
         }))
         console.log('Авторизация')
       }
@@ -233,33 +231,38 @@ export default {
       }else if(this.ischeckregistrationModel.password !== this.ischeckregistrationModel.password2){
         console.log('Пароли не совпадают')
       }else if(this.successRules === true){
-        this.$trigger(CLIENT_EVENTS.AUTH_SEND_REGISTER_DATA, JSON.stringify({
-          login:this.ischeckregistrationModel.login,
-          email:this.ischeckregistrationModel.email,
-          password:this.ischeckregistrationModel.password,
-          password2:this.ischeckregistrationModel.password2,
+        this.$trigger('client.auth.transferRegistrationData', JSON.stringify({
+          login: this.ischeckregistrationModel.login,
+          email: this.ischeckregistrationModel.email,
+          password: this.ischeckregistrationModel.password,
+          promo: '',
+          acceptPolicy: this.successRules
         }))
         console.log('Регистрация')
-        this.isRecoveryCodeReg = true;
-        this.isAuthRegBlock = false;
       }else{
         console.log('Подтвердите правила проекта')
       }
 
     },
     showAuth(){
-      if(this.isAuth === false){
-        this.isAuth = true;
-        this.isReg = false;
-      }
+      this.isAuthRegBlock = true
+      this.isAuth = true
+      this.isReg = false
+      this.isRecovery = false
+      this.isRecoveryCode = false
+      this.isNewPassword = false
+      this.isRecoveryCodeReg = false
     },
     showReg(){
-      if(this.isReg === false){
-        this.isReg = true;
-        this.isAuth = false;
-      }
+      this.isAuthRegBlock = true
+      this.isAuth = false
+      this.isReg = true
+      this.isRecovery = false
+      this.isRecoveryCode = false
+      this.isNewPassword = false
+      this.isRecoveryCodeReg = false
     },
-    showRecovery(){
+    showRecovery() {
       if (this.isRecovery === false){
         this.isRecovery = true;
         this.isAuthRegBlock = false;
@@ -276,7 +279,8 @@ export default {
       this.isNewPassword = false;
       this.isRecoveryCode = true;
     },
-    showRecoveryCode(){
+    showRecoveryCode(email){
+      this.recoveryModel.email = email
       if(this.recoveryModel.email === ''){
         console.log('Введите почту')
       }else{
@@ -284,16 +288,31 @@ export default {
         this.isRecovery = false;
       }
     },
-    showNewPassword(){
+    showRegistrationCode(){
+      if(this.recoveryModel.email === ''){
+        this.isAuthRegBlock = false
+        this.isAuth = false
+        this.isReg = false
+        this.isRecovery = false
+        this.isRecoveryCode = false
+        this.isNewPassword = false
+        this.isRecoveryCodeReg = true
+      }else{
+        this.isRecoveryCodeReg = true;
+        this.isAuthRegBlock = false;
+      }
+    },
+    sendRegistrationCode() {
+      this.$trigger('client.auth.transferRegistrationConfirmData', JSON.stringify({
+        email: this.ischeckregistrationModel.email,
+        code: Object.values(this.recoveryCode).join('')
+      }))
+    },
+    showNewPassword() {
       const fullcode = parseInt(this.recoveryCode.number1 + this.recoveryCode.number2 + this.recoveryCode.number3 + this.recoveryCode.number4 + this.recoveryCode.number5 + this.recoveryCode.number6);
       console.log(fullcode)
-      // if (fullcode === this.TestCode){
-      //   console.log("Код верен")
-      //   this.isRecoveryCode = false;
-      //   this.isNewPassword = true;
-      // }else{
-      //   console.log("Ошибка")
-      // }
+      this.isRecoveryCode = false;
+      this.isNewPassword = true;
     },
     FinalNewPassword(){
       if (this.newPassword.password1 === ''){
@@ -302,10 +321,31 @@ export default {
         console.log('Введите новый пароль повторно')
       }else if(this.newPassword.password1 === this.newPassword.password2){
         console.log('Пароль успешно изменен')
+
+        this.$trigger('client.auth.transferRecoveryData', JSON.stringify({
+          email: this.recoveryModel.email,
+          code: Object.values(this.recoveryCode).join(""),
+          password: this.newPassword.password1
+        }))
       }else{
         console.log('пароли не совпадают')
       }
+    },
+
+    sendRecoveryEmail() {
+      this.$trigger('client.auth.transferRecoveryEmail', this.recoveryModel.email)
     }
+  },
+  mounted() {
+    this.$addEvent('cef.auth.setRecoveryConfirmStage', this.showRecoveryCode)
+    this.$addEvent('cef.auth.setRecoveryFinalStage', this.showAuth)
+
+    this.$addEvent('cef.auth.setRegistrationConfirmStage', this.showRegistrationCode)
+  },
+  unmounted() {
+    this.$removeEvent('cef.auth.setRecoveryConfirmStage')
+    this.$removeEvent('cef.auth.setRecoveryFinalStage')
+    this.$removeEvent('cef.auth.setRegistrationConfirmStage')
   }
 }
 </script>

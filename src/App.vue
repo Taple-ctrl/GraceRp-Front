@@ -15,11 +15,26 @@ export default {
     HudMain,
     AuthMain
   },
-  data(){
+  data() {
     return {
       isHud: false,
       isAuth: true,
     }
+  },
+  mounted() {
+    this.$addEvent('pushRoute', (options) => {
+      if (options.name == 'auth-login') {
+        this.isHud = false
+        this.isAuth = true
+      }
+      else if (options.name == 'hud') {
+        this.isHud = true
+        this.isAuth = false
+      }
+    })
+  },
+  unmounted() {
+
   }
 }
 </script>
