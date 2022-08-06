@@ -81,7 +81,7 @@
         <div class="authBlock_title">Восстановление</div>
         <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
       </div>
-      <div class="login-input">
+      <div class="login-input login-input-recovery">
         <img src="../assets/images/auth/icons/bxs_user-account.png" alt="bxs_user-account">
         <input type="text" v-model="recoveryModel.email" placeholder="E-mail">
       </div>
@@ -97,7 +97,7 @@
           <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
         </div>
         <div class="recover-code-input">
-          <input v-model="recoveryCode.number1" type="text" maxlength="1">
+          <input v-model="recoveryCode.number1" type="text"  maxlength="1">
           <input v-model="recoveryCode.number2" type="text"  maxlength="1">
           <input v-model="recoveryCode.number3" type="text"  maxlength="1">
           <input v-model="recoveryCode.number4" type="text"  maxlength="1">
@@ -118,7 +118,7 @@
           <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
         </div>
         <div class="recover-code-input">
-          <input v-model="recoveryCode.number1" type="text" maxlength="1">
+          <input v-model="recoveryCode.number1" type="text"  maxlength="1">
           <input v-model="recoveryCode.number2" type="text"  maxlength="1">
           <input v-model="recoveryCode.number3" type="text"  maxlength="1">
           <input v-model="recoveryCode.number4" type="text"  maxlength="1">
@@ -375,7 +375,6 @@ body{
   display: flex;
   align-items: center;
   gap: 17px;
-  margin-bottom: 5%;
 }
 
 .login-input img{
@@ -390,6 +389,7 @@ body{
   outline:none;
   color: darkgray;
   padding: 0.5em;
+  width: 100%;
 }
 
 .login-input input::-webkit-input-placeholder{
@@ -722,6 +722,14 @@ body{
 .newPassword-subtitle{
   width: 100%;
   text-align: left;
+}
+
+.login-input-recovery{
+  margin-bottom: 5%;
+}
+
+.login-input-recovery input{
+  width: 100%;
 }
 
 </style>
