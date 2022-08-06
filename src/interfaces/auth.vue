@@ -109,6 +109,27 @@
       </div>
     </div>
 
+    <div class="recover-code" v-if="isRecoveryCodeReg">
+      <img v-on:click="backRecoveryCode" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <div class="recover-code-block">
+        <div class="recover-code-block-text">
+          <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
+          <div class="authBlock_title">Регистрация</div>
+          <div class="authBlock_subtitle">Упс... Ты кажется забыл пароль от аккаунта? Тогда<br> восстанавливай его быстрее и будь снова в строю.</div>
+        </div>
+        <div class="recover-code-input">
+          <input v-model="recoveryCode.number1" type="text" maxlength="1">
+          <input v-model="recoveryCode.number2" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number3" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number4" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number5" type="text"  maxlength="1">
+          <input v-model="recoveryCode.number6" type="text"  maxlength="1">
+        </div>
+        <div class="authBlock_subtitle">Введите шестизначный код, который вы получили на свою почту.</div>
+        <div class="Auth_btn" v-on:click="showNewPassword">Завершить регистрацию</div>
+      </div>
+    </div>
+
     <div class="recover-code" v-if="isNewPassword">
       <img v-on:click="backNewPassword" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
       <div class="recover-code-block">
@@ -150,9 +171,9 @@ export default {
       isReg: false,
       isRecovery: false,
       isRecoveryCode:false,
-      TestCode: 666666,
       successRules: false,
       isNewPassword: false,
+      isRecoveryCodeReg:false,
       ischeckregistrationModel: {
         login: '',
         email: '',
@@ -219,6 +240,8 @@ export default {
           password2:this.ischeckregistrationModel.password2,
         }))
         console.log('Регистрация')
+        this.isRecoveryCodeReg = true;
+        this.isAuthRegBlock = false;
       }else{
         console.log('Подтвердите правила проекта')
       }
@@ -264,14 +287,13 @@ export default {
     showNewPassword(){
       const fullcode = parseInt(this.recoveryCode.number1 + this.recoveryCode.number2 + this.recoveryCode.number3 + this.recoveryCode.number4 + this.recoveryCode.number5 + this.recoveryCode.number6);
       console.log(fullcode)
-      console.log(this.TestCode)
-      if (fullcode === this.TestCode){
-        console.log("Код верен")
-        this.isRecoveryCode = false;
-        this.isNewPassword = true;
-      }else{
-        console.log("Ошибка")
-      }
+      // if (fullcode === this.TestCode){
+      //   console.log("Код верен")
+      //   this.isRecoveryCode = false;
+      //   this.isNewPassword = true;
+      // }else{
+      //   console.log("Ошибка")
+      // }
     },
     FinalNewPassword(){
       if (this.newPassword.password1 === ''){
