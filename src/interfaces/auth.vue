@@ -524,7 +524,7 @@ body{
   padding: 3%;
   display: flex;
   align-items: center;
-  gap: 17px;
+  gap: 0.5vh;
 }
 
 .password-input img{
