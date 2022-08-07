@@ -152,6 +152,55 @@
         <div class="Auth_btn" v-on:click="FinalNewPassword">Восстановить</div>
       </div>
     </div>
+
+    <div class="Auth-block" v-if="isSurvey">
+      <img v-on:click="backSurvey" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <div class="Auth-block-text">
+        <img class="user-plus survey-icon" src="../assets/images/auth/icons/survey.png" alt="user-plus">
+        <div class="authBlock_title">Опрос</div>
+        <div class="authBlock_subtitle">Нам важно знать откуда, вы узнали о нашем проекте.</div>
+      </div>
+      <div class="Reg">
+        <div class="login-input surveyBtn" v-bind:class="{ YouTube: isYouTube }" v-on:click="surveyYoutube">
+          <img src="../assets/images/auth/icons/YouTubeActive.png" alt="YouTube" v-if="isYouTube">
+          <img src="../assets/images/auth/icons/Youtube.png" alt="YouTube" v-else>
+          <div class="surveyText">YouTube</div>
+        </div>
+        <div class="login-input surveyBtn" v-bind:class="{ VK: isVK }" v-on:click="surveyVK">
+          <img src="../assets/images/auth/icons/VK.png" alt="VK" v-if="isVK">
+          <img src="../assets/images/auth/icons/VK.png" alt="VK" v-else>
+          <div class="surveyText">VKонтакте</div>
+        </div>
+        <div class="login-input surveyBtn" v-bind:class="{ TikTok: isTikTok }" v-on:click="surveyTikTok">
+          <img src="../assets/images/auth/icons/TikTokActive.png" alt="TikTok" v-if="isTikTok">
+          <img src="../assets/images/auth/icons/TikTok.png" alt="TikTok" v-else>
+          <div class="surveyText">TikTok</div>
+        </div>
+        <div class="login-input surveyBtn" v-on:click="isYouTube = false; isTikTok = false; isVK = false">
+          <img src="../assets/images/auth/icons/YouVariant.png" alt="fluent_lock">
+          <input type="text" v-model="surveyChoiceVariant" placeholder="Свой вариант">
+        </div>
+        <div class="Auth_btn" v-on:click="getSurvey">Продолжить</div>
+      </div>
+    </div>
+
+    <div class="referral" v-if="isReferral">
+      <img v-on:click="backReferral" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <div class="recover-code-block">
+        <div class="recover-code-block-text">
+          <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
+          <div class="authBlock_title">Опрос</div>
+          <div class="referral-title">Нам важно знать откуда, вы узнали о нашем проекте.</div>
+        </div>
+        <div class="referral-input">
+          <img src="../assets/images/auth/icons/bxs_user-account.png" alt="bxs_user-account">
+          <input type="text" v-model="referralText" placeholder="Ссылка на канал или промокод">
+        </div>
+        <div class="referral-subtitle">Вставьте ссылку на канал, сообщество или введите промокод от куда вы о нас узнали.</div>
+        <div class="Auth_btn" v-on:click="sendReferral">Отправить</div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -171,6 +220,15 @@ export default {
       successRules: false,
       isNewPassword: false,
       isRecoveryCodeReg:false,
+      isReferral: false,
+      isSurvey: false,
+      YouTubeIcon: 'Youtube',
+      isYouTube: false,
+      isVK: false,
+      isTikTok: false,
+      referralText: '',
+      surveyChoice: '',
+      surveyChoiceVariant: '',
       ischeckregistrationModel: {
         login: '',
         email: '',
@@ -244,6 +302,25 @@ export default {
       }
 
     },
+    getSurvey(){
+      if(this.surveyChoiceVariant !== ''){
+        this.surveyChoice = this.surveyChoiceVariant
+      }else if(this.isYouTube === true){
+        this.surveyChoice = 'YouTube'
+      }else if(this.isVK === true){
+        this.surveyChoice = 'VK'
+      }else if(this.isTikTok === true){
+        this.surveyChoice = 'TikTok'
+      }
+
+      if(this.surveyChoiceVariant === '' & this.isYouTube === false & this.isVK === false & this.isTikTok === false){
+        console.log('Выберете пункт')
+      }else{
+        console.log(this.surveyChoice)
+        this.isSurvey = false;
+        this.isReferral = true;
+      }
+    },
     showAuth(){
       this.isAuthRegBlock = true
       this.isAuth = true
@@ -278,6 +355,15 @@ export default {
     backNewPassword(){
       this.isNewPassword = false;
       this.isRecoveryCode = true;
+    },
+    backSurvey(){
+      this.isSurvey = false;
+      this.isAuthRegBlock = true;
+      this.isReg = true;
+    },
+    backReferral(){
+      this.isSurvey = true;
+      this.isReferral = false;
     },
     showRecoveryCode(email){
       this.recoveryModel.email = email
@@ -331,9 +417,38 @@ export default {
         console.log('пароли не совпадают')
       }
     },
+    sendReferral(){
+      if(this.referralText === ''){
+        console.log('Введите текст')
+      }else{
+        console.log(this.referralText)
+      //  Отправить 2 опросник переход на авторизацию
+      }
 
+    },
     sendRecoveryEmail() {
       this.$trigger('client.auth.transferRecoveryEmail', this.recoveryModel.email)
+    },
+    surveyYoutube(){
+      this.surveyChoice = 'YouTube';
+      this.surveyChoiceVariant = '';
+      this.isYouTube = true;
+      this.isVK = false;
+      this.isTikTok = false;
+    },
+    surveyVK(){
+      this.surveyChoice = 'VK';
+      this.surveyChoiceVariant = '';
+      this.isYouTube = false;
+      this.isVK = true;
+      this.isTikTok = false;
+    },
+    surveyTikTok(){
+      this.surveyChoice = 'TikTok';
+      this.surveyChoiceVariant = '';
+      this.isYouTube = false;
+      this.isVK = false;
+      this.isTikTok = true;
     }
   },
   mounted() {
@@ -374,7 +489,8 @@ body{
   padding: 3%;
   display: flex;
   align-items: center;
-  gap: 17px;
+  gap: 0.5vh;
+  width: 100%;
 }
 
 .login-input img{
@@ -730,6 +846,111 @@ body{
 
 .login-input-recovery input{
   width: 100%;
+}
+
+.surveyBtn{
+  cursor: pointer;
+  user-select: none;
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 1.2vw;
+
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.surveyBtn input[type="text"]{
+  padding: 0.5em 0;
+}
+
+.YouTube{
+  background: #FF1515;
+  color: white;
+}
+
+.YouTube img{
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.VK{
+  background: #638AEE;
+  color: white;
+}
+
+.VK img{
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.TikTok{
+  background: linear-gradient(90.16deg, #FF5CF8 0.09%, #0FD4FF 99.86%);
+  color: white;
+}
+
+.TikTok img{
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.survey-icon{
+  padding: 2vh 2vw;
+}
+
+.referral{
+  background: #101010;
+  border-radius: 9px;
+  width: 26vw;
+  height: 40vh;
+  padding: 3vh 1.5vw;
+}
+
+.referral-title{
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 0.8vw;
+  text-align: left;
+  color: #535353;
+}
+
+.referral-subtitle{
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 0.8vw;
+  text-align: left;
+  color: #535353;
+}
+
+.referral-input{
+  background: #161616;
+  border-radius: 5px;
+  padding: 3%;
+  display: flex;
+  align-items: center;
+  gap: 0.5vh;
+  width: 100%;
+}
+
+.referral-input img{
+  background: #1C1C1C;
+  border-radius: 5px;
+  padding:5px;
+}
+
+.referral-input input[type="text"]{
+  background-color: rgb(0,0,0,0);
+  border: 0;
+  outline:none;
+  color: darkgray;
+  padding: 0.5em;
+  width: 100%;
+}
+
+.referral-input input::-webkit-input-placeholder{
+  font-family: 'Nunito',sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 0.8vw;
+  color: rgba(255, 255, 255, 0.2);
 }
 
 </style>
