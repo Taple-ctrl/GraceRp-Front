@@ -293,7 +293,6 @@ export default {
           login: this.ischeckregistrationModel.login,
           email: this.ischeckregistrationModel.email,
           password: this.ischeckregistrationModel.password,
-          promo: '',
           acceptPolicy: this.successRules
         }))
         console.log('Регистрация')
@@ -316,9 +315,11 @@ export default {
       if(this.surveyChoiceVariant === '' & this.isYouTube === false & this.isVK === false & this.isTikTok === false){
         console.log('Выберете пункт')
       }else{
-        console.log(this.surveyChoice)
-        this.isSurvey = false;
-        this.isReferral = true;
+        this.$trigger('client.auth.transferRegistrationPromoData', JSON.stringify({
+          login: this.ischeckregistrationModel.login,
+          password: this.ischeckregistrationModel.password,
+          promo: this.surveyChoice
+        }))
       }
     },
     showAuth(){
@@ -338,6 +339,17 @@ export default {
       this.isRecoveryCode = false
       this.isNewPassword = false
       this.isRecoveryCodeReg = false
+    },
+    showPromo(){
+      this.isAuthRegBlock = false
+      this.isRecoveryCode = false
+      this.isRecoveryCodeReg = false
+      this.isReg = false
+      this.isSurvey = true
+    },
+    showReferral(){
+      this.isSurvey = false
+      this.isReferral = true
     },
     showRecovery() {
       if (this.isRecovery === false){
@@ -362,8 +374,10 @@ export default {
       this.isReg = true;
     },
     backReferral(){
-      this.isSurvey = true;
-      this.isReferral = false;
+      this.isRecovery = false
+      this.isRecoveryCode = false
+      this.isSurvey = true
+      this.isReferral = false
     },
     showRecoveryCode(email){
       this.recoveryModel.email = email
@@ -421,8 +435,11 @@ export default {
       if(this.referralText === ''){
         console.log('Введите текст')
       }else{
-        console.log(this.referralText)
-      //  Отправить 2 опросник переход на авторизацию
+        this.$trigger('client.auth.transferRegistrationReferralData', JSON.stringify({
+          login: this.ischeckregistrationModel.login,
+          password: this.ischeckregistrationModel.password,
+          referralLink: this.referralText
+        }))
       }
 
     },
@@ -456,11 +473,15 @@ export default {
     this.$addEvent('cef.auth.setRecoveryFinalStage', this.showAuth)
 
     this.$addEvent('cef.auth.setRegistrationConfirmStage', this.showRegistrationCode)
+    this.$addEvent('cef.auth.showPromo', this.showPromo)
+    this.$addEvent('cef.auth.showReferralPromo', this.showReferral)
   },
   unmounted() {
     this.$removeEvent('cef.auth.setRecoveryConfirmStage')
     this.$removeEvent('cef.auth.setRecoveryFinalStage')
     this.$removeEvent('cef.auth.setRegistrationConfirmStage')
+    this.$removeEvent('cef.auth.showPromo')
+    this.$removeEvent('cef.auth.showReferralPromo')
   }
 }
 </script>
