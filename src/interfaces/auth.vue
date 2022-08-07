@@ -75,7 +75,7 @@
     </div>
 
     <div class="recover" v-if="isRecovery">
-      <img v-on:click="showRecovery" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
+      <img v-on:click="backRecovery" class="back-auth" src="../assets/images/auth/icons/back-auth.png" alt="back_auth">
       <div class="Auth-block-text">
         <img class="user-plus" src="../assets/images/auth/icons/user-plus.png" alt="user-plus">
         <div class="authBlock_title">Восстановление</div>
@@ -212,10 +212,10 @@ export default {
   },
   data(){
     return{
-      isAuthRegBlock: true,
-      isAuth: true,
+      isAuthRegBlock: false,
+      isAuth: false,
       isReg: false,
-      isRecovery: false,
+      isRecovery: true,
       isRecoveryCode:false,
       successRules: false,
       isNewPassword: false,
@@ -378,6 +378,11 @@ export default {
       this.isRecoveryCode = false
       this.isSurvey = true
       this.isReferral = false
+    },
+    backRecovery(){
+      this.isRecovery = false;
+      this.isAuthRegBlock = true;
+      this.isReg = true;
     },
     showRecoveryCode(email){
       this.recoveryModel.email = email
